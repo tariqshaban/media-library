@@ -1,5 +1,6 @@
 package com.multimedia.media_library.component;
 
+import com.multimedia.media_library.service.FileUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -11,11 +12,20 @@ import java.nio.file.Paths;
 
 @Component
 public class ApplicationStartup {
+    private final FileUserDetailsService fileUserDetailsService;
+
     @Value("${com.multimedia.media-library.media.path}")
     private String mediaPath;
+
+    public ApplicationStartup(FileUserDetailsService fileUserDetailsService) {
+        this.fileUserDetailsService = fileUserDetailsService;
+    }
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() throws IOException {
         Files.createDirectories(Paths.get(mediaPath));
+        for (String user : fileUserDetailsService.getUsers()) {
+            Files.createDirectories(Paths.get(mediaPath).resolve(user));
+        }
     }
 }

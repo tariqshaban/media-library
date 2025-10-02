@@ -1,0 +1,3 @@
+#username:bcrypt_password
+user1:$2a$12$lBc.J3706P1eBtAE.h/X9.uMsz824VQwF8yYCg0MqpyXVLyPygXrm
+user2:$2a$12$7NApoCo89UgzwFXXCENw6O9b9m1L91XSfGJ.a6UD2EDH6VtULt0GC

@@ -1,4 +1,4 @@
-package com.multimedia.media_library.utils.validator;
+package com.multimedia.media_library.utils.file_validator;
 
 import com.multimedia.media_library.dto.UploadFileRequest;
 import com.multimedia.media_library.model.Violation;
@@ -16,14 +16,12 @@ import java.util.Objects;
 import static java.util.Optional.of;
 
 @Component
-public class AddFileValidator implements Validator<UploadFileRequest> {
-    @Value("${com.multimedia.media-library.media.path}")
-    private String mediaPath;
+public class AddFileValidator implements FileValidator<UploadFileRequest> {
     @Value("${com.multimedia.media-library.media.allowed.extensions}")
     private List<String> allowedExtensions;
 
     @Override
-    public List<Violation> validate(UploadFileRequest uploadFileRequest) {
+    public List<Violation> validate(String directory, UploadFileRequest uploadFileRequest) {
         List<Violation> violations = new ArrayList<>();
         MultipartFile file = uploadFileRequest.getFile();
 
@@ -47,7 +45,7 @@ public class AddFileValidator implements Validator<UploadFileRequest> {
             return violations;
         }
 
-        Path path = Paths.get(mediaPath).resolve(filename);
+        Path path = Paths.get(directory).resolve(filename);
         if (Files.exists(path)) {
             violations.add(new Violation(String.format("File named \"%s\" already exist.", filename)));
         }

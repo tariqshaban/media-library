@@ -2,12 +2,19 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 1050;
+    z-index: 100;
 }
 
 .theme-toggle {
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 1100;
+    z-index: 100;
+}
+
+.logout-button {
+    position: fixed;
+    top: 20px;
+    left: 70px;
+    z-index: 100;
 }

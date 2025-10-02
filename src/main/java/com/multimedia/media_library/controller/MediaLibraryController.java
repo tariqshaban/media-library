@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +48,8 @@ class MediaLibraryController implements RedirectAttributeProvider {
     }
 
     @GetMapping("/")
-    String index(Model model) {
+    String index(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        model.addAttribute("username", userDetails.getUsername());
         model.addAttribute("allowedExtensions", allowedExtensionsTransformed);
         model.addAttribute("uploadFileRequest", new UploadFileRequest());
         model.addAttribute("fileMetadataResponse", mediaLibraryService.getFiles());
@@ -110,6 +115,8 @@ class MediaLibraryController implements RedirectAttributeProvider {
 
     @Override
     public void addRedirectAttributes(RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        redirectAttributes.addFlashAttribute("username", ((UserDetails) auth.getPrincipal()).getUsername());
         redirectAttributes.addFlashAttribute("allowedExtensions", allowedExtensionsTransformed);
         redirectAttributes.addFlashAttribute("uploadFileRequest", new UploadFileRequest());
         redirectAttributes.addFlashAttribute("fileMetadataResponse", mediaLibraryService.getFiles());

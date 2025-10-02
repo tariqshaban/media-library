@@ -10,12 +10,15 @@ import com.multimedia.media_library.mapper.FileMetadataDetailedMapper;
 import com.multimedia.media_library.mapper.FileMetadataMapper;
 import com.multimedia.media_library.model.RenameFileRequest;
 import com.multimedia.media_library.model.Violation;
-import com.multimedia.media_library.utils.validator.AddFileValidator;
-import com.multimedia.media_library.utils.validator.DeleteFileValidator;
-import com.multimedia.media_library.utils.validator.GetFileValidator;
-import com.multimedia.media_library.utils.validator.RenameFileValidator;
+import com.multimedia.media_library.utils.file_validator.AddFileValidator;
+import com.multimedia.media_library.utils.file_validator.DeleteFileValidator;
+import com.multimedia.media_library.utils.file_validator.GetFileValidator;
+import com.multimedia.media_library.utils.file_validator.RenameFileValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -37,6 +40,7 @@ public class MediaLibraryService {
     private final DeleteFileValidator deleteFileValidator;
     private final FileMetadataMapper fileMetadataMapper;
     private final FileMetadataDetailedMapper fileMetadataDetailedMapper;
+
     @Value("${com.multimedia.media-library.media.path}")
     private String mediaPath;
 
@@ -52,7 +56,8 @@ public class MediaLibraryService {
     }
 
     public List<FileMetadataResponse> getFiles() {
-        File folder = new File(mediaPath);
+        String userMediaPath = getUserMediaPath();
+        File folder = new File(userMediaPath);
         return Arrays.stream(Objects.requireNonNull(folder.listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getPath)
@@ -62,12 +67,13 @@ public class MediaLibraryService {
     }
 
     public FileMetadataDetailedResponse getFile(String filename) {
-        List<Violation> violations = getFileValidator.validate(filename);
+        String userMediaPath = getUserMediaPath();
+        List<Violation> violations = getFileValidator.validate(userMediaPath, filename);
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
         }
 
-        String filePath = mediaPath +
+        String filePath = userMediaPath +
                 File.separator +
                 filename;
         return fileMetadataDetailedMapper.toFileMetadataResponse(
@@ -77,10 +83,11 @@ public class MediaLibraryService {
     }
 
     public VideoServingResponse serveVideo(String filename) {
+        String userMediaPath = getUserMediaPath();
         try {
             VideoServingResponse videoServingResponse = new VideoServingResponse();
 
-            Path videoPath = Paths.get(mediaPath).resolve(filename);
+            Path videoPath = Paths.get(userMediaPath).resolve(filename);
             UrlResource resource = new UrlResource(videoPath.toUri());
             videoServingResponse.setResource(resource);
 
@@ -94,13 +101,14 @@ public class MediaLibraryService {
     }
 
     public void addFile(UploadFileRequest uploadFileRequest) {
+        String userMediaPath = getUserMediaPath();
         try {
-            List<Violation> violations = addFileValidator.validate(uploadFileRequest);
+            List<Violation> violations = addFileValidator.validate(userMediaPath, uploadFileRequest);
             if (!violations.isEmpty()) {
                 throw new ValidationException(violations);
             }
 
-            String filePath = mediaPath +
+            String filePath = userMediaPath +
                     File.separator +
                     uploadFileRequest.getFile().getOriginalFilename();
             uploadFileRequest.getFile().transferTo(new File(filePath));
@@ -110,14 +118,16 @@ public class MediaLibraryService {
     }
 
     public void renameFile(String id, String newFilename) {
+        String userMediaPath = getUserMediaPath();
         try {
-            List<Violation> violations = renameFileValidator.validate(new RenameFileRequest(id, newFilename));
+            List<Violation> violations = renameFileValidator.validate(userMediaPath, new RenameFileRequest(id, newFilename));
             if (!violations.isEmpty()) {
                 throw new ValidationException(violations);
             }
 
-            Path path = Paths.get(mediaPath).resolve(id);
-            Path pathNewFilename = Paths.get(mediaPath).resolve(newFilename);
+            Path basePath = Paths.get(userMediaPath);
+            Path path = basePath.resolve(id);
+            Path pathNewFilename = basePath.resolve(newFilename);
             Files.move(path, pathNewFilename);
         } catch (IOException e) {
             throw new UnhandledException(String.format("Failed to rename file named \"%s\" to \"%s\"", id, newFilename));
@@ -125,16 +135,22 @@ public class MediaLibraryService {
     }
 
     public void deleteFile(String filename) {
+        String userMediaPath = getUserMediaPath();
         try {
-            List<Violation> violations = deleteFileValidator.validate(filename);
+            List<Violation> violations = deleteFileValidator.validate(userMediaPath, filename);
             if (!violations.isEmpty()) {
                 throw new ValidationException(violations);
             }
 
-            Path path = Paths.get(mediaPath).resolve(filename);
+            Path path = Paths.get(userMediaPath).resolve(filename);
             Files.delete(path);
         } catch (IOException e) {
             throw new UnhandledException(String.format("Failed to delete file named \"%s\"", filename));
         }
+    }
+
+    private String getUserMediaPath() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return mediaPath + File.separator + ((UserDetails) auth.getPrincipal()).getUsername();
     }
 }
