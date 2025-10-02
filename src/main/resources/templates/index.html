@@ -14,7 +14,7 @@
 <div class="toast-container">
     <div class="toast align-items-center text-bg-success border-0" role="alert" th:if="${successMessage}">
         <div class="d-flex">
-            <div class="toast-body">
+            <div class="toast-body" style="word-break: break-word; overflow-wrap: break-word;">
                 <i class="bi bi-check-circle-fill me-2"></i>
                 <strong class="me-2">Success</strong>
                 <div style="white-space: pre-wrap;" th:text="${successMessage}"></div>
@@ -24,7 +24,7 @@
     </div>
     <div class="toast align-items-center text-bg-danger border-0" role="alert" th:if="${errorMessage}">
         <div class="d-flex">
-            <div class="toast-body">
+            <div class="toast-body" style="word-break: break-word; overflow-wrap: break-word;">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <strong class="me-2">Error</strong>
                 <div style="white-space: pre-wrap;" th:text="${errorMessage}"></div>
@@ -182,11 +182,15 @@
                         </tr>
                         <tr>
                             <th scope="row">Total Bitrate</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.generalInfo.totalBitrate}">Total Bitrate</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.generalInfo.totalBitrate}">
+                                Total Bitrate
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Streamable</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.generalInfo.isStreamable} ? 'Yes' : 'No'">Streamable</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.generalInfo.isStreamable} ? 'Yes' : 'No'">
+                                Streamable
+                            </td>
                         </tr>
 
                         <tr class="table-secondary">
@@ -198,19 +202,25 @@
                         </tr>
                         <tr>
                             <th scope="row">Encoder</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.encoder}">Encoder</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.encoder}">Encoder
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Bit depth</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.bitDepth}">Bit depth</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.bitDepth}">Bit
+                                depth
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Bit rate</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.bitRate}">Bit rate</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.bitRate}">Bit rate
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Resolution</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.width + '×' + fileMetadataDetailedResponse.mediaInformation.videoInfo.height}">Resolution</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.width + '×' + fileMetadataDetailedResponse.mediaInformation.videoInfo.height}">
+                                Resolution
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Frame count</th>
@@ -218,11 +228,15 @@
                         </tr>
                         <tr>
                             <th scope="row">FPS</th>
-                            <td th:text="${#numbers.formatDecimal(fileMetadataDetailedResponse.mediaInformation.videoInfo.framesPerSecond,1,2)}">FPS</td>
+                            <td th:text="${#numbers.formatDecimal(fileMetadataDetailedResponse.mediaInformation.videoInfo.framesPerSecond,1,2)}">
+                                FPS
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Aspect ratio</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.aspectRatio}">Aspect ratio</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.videoInfo.aspectRatio}">Aspect
+                                ratio
+                            </td>
                         </tr>
 
                         <tr class="table-secondary">
@@ -234,23 +248,32 @@
                         </tr>
                         <tr>
                             <th scope="row">Bit rate</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.bitRate}">Bit rate</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.bitRate}">Bit rate
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Bit rate mode</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.bitRateMode}">Bit rate mode</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.bitRateMode}">Bit
+                                rate mode
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Channels</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.numberOfChannels}">Channels</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.numberOfChannels}">
+                                Channels
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Compression</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.compressionMode}">Compression</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.compressionMode}">
+                                Compression
+                            </td>
                         </tr>
                         <tr>
                             <th scope="row">Sampling rate</th>
-                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.samplingRate}">Sampling rate</td>
+                            <td th:text="${fileMetadataDetailedResponse.mediaInformation.audioInfo.samplingRate}">
+                                Sampling rate
+                            </td>
                         </tr>
                         </tbody>
                     </table>
