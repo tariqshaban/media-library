@@ -77,10 +77,10 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
+                        <table class="table table-fixed table-hover table-striped mb-0">
                             <thead class="table">
                             <tr>
-                                <th colspan="3"><i class="bi bi-file-earmark"></i>Name</th>
+                                <th style="max-width: 400px;"><i class="bi bi-file-earmark"></i>Name</th>
                                 <th>Extension</th>
                                 <th>Size</th>
                                 <th>Actions</th>
@@ -94,8 +94,8 @@
                                 </td>
                             </tr>
                             <tr th:each="file : ${fileMetadataResponse}">
-                                <td colspan="3">
-                                    <i class="bi bi-file-earmark-text text-primary ms-2"></i>
+                                <td style="max-width: 400px;" class="text-truncate">
+                                    <i class="bi bi-file-earmark-text text-primary ms-2 "></i>
                                     <span class="ms-2" th:text="${file.name}">Name</span>
                                 </td>
                                 <td>
@@ -144,20 +144,113 @@
             <div class="modal-body">
                 <div class="p-3">
                     <div class="mb-3 text-center">
-                        <video controls id="fileInfoVideo" style="width: 100%; height: auto;">
+                        <video controls id="fileInfoVideo" style="width: 100%; height: auto; max-height: 420px;">
                             <source th:attr="src=@{/serve-video/{id}(id=${fileMetadataDetailedResponse.id})}">
                             Your browser does not support the video tag.
                         </video>
                     </div>
                     <table class="table table-striped table-bordered mb-0">
                         <tbody>
+                        <tr class="table-secondary">
+                            <th colspan="2" class="text-center">General Info</th>
+                        </tr>
                         <tr>
                             <th scope="row">Extension</th>
                             <td th:text="${fileMetadataDetailedResponse.extension}">Extension</td>
                         </tr>
                         <tr>
                             <th scope="row">Size</th>
-                            <td th:text="${fileMetadataDetailedResponse.size}">Size</td>
+                            <td th:text="${@fileSize.formatSize(fileMetadataDetailedResponse.size)}">Size</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Duration</th>
+                            <td th:text="${@fileDuration.formatDuration(fileMetadataDetailedResponse.generalInfo.duration)}">
+                                Duration
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Created</th>
+                            <td th:text="${#dates.format(fileMetadataDetailedResponse.generalInfo.creationDate, 'yyyy-MM-dd HH:mm:ss')}">
+                                Created
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Modified</th>
+                            <td th:text="${#dates.format(fileMetadataDetailedResponse.generalInfo.modificationDate, 'yyyy-MM-dd HH:mm:ss')}">
+                                Modified
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total Bitrate</th>
+                            <td th:text="${fileMetadataDetailedResponse.generalInfo.totalBitrate}">Total Bitrate</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Streamable</th>
+                            <td th:text="${fileMetadataDetailedResponse.generalInfo.isStreamable} ? 'Yes' : 'No'">Streamable</td>
+                        </tr>
+
+                        <tr class="table-secondary">
+                            <th colspan="2" class="text-center">Video Info</th>
+                        </tr>
+                        <tr>
+                            <th scope="row">Codec</th>
+                            <td th:text="${fileMetadataDetailedResponse.videoInfo.codec}">Codec</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Encoder</th>
+                            <td th:text="${fileMetadataDetailedResponse.videoInfo.encoder}">Encoder</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bit depth</th>
+                            <td th:text="${fileMetadataDetailedResponse.videoInfo.bitDepth}">Bit depth</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bit rate</th>
+                            <td th:text="${fileMetadataDetailedResponse.videoInfo.bitRate}">Bit rate</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Resolution</th>
+                            <td th:text="${fileMetadataDetailedResponse.videoInfo.width + '×' + fileMetadataDetailedResponse.videoInfo.height}">Resolution</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Frame count</th>
+                            <td th:text="${fileMetadataDetailedResponse.videoInfo.frames}">Frames</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">FPS</th>
+                            <td th:text="${#numbers.formatDecimal(fileMetadataDetailedResponse.videoInfo.framesPerSecond,1,2)}">FPS</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Aspect ratio</th>
+                            <td th:text="${fileMetadataDetailedResponse.videoInfo.aspectRatio}">Aspect ratio</td>
+                        </tr>
+
+                        <tr class="table-secondary">
+                            <th colspan="2" class="text-center">Audio Info</th>
+                        </tr>
+                        <tr>
+                            <th scope="row">Codec</th>
+                            <td th:text="${fileMetadataDetailedResponse.audioInfo.codec}">Codec</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bit rate</th>
+                            <td th:text="${fileMetadataDetailedResponse.audioInfo.bitRate}">Bit rate</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bit rate mode</th>
+                            <td th:text="${fileMetadataDetailedResponse.audioInfo.bitRateMode}">Bit rate mode</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Channels</th>
+                            <td th:text="${fileMetadataDetailedResponse.audioInfo.numberOfChannels}">Channels</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Compression</th>
+                            <td th:text="${fileMetadataDetailedResponse.audioInfo.compressionMode}">Compression</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Sampling rate</th>
+                            <td th:text="${fileMetadataDetailedResponse.audioInfo.samplingRate}">Sampling rate</td>
                         </tr>
                         </tbody>
                     </table>
