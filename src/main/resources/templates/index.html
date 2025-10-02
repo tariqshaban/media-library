@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Media Library</title>
+    <link href="/images/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body data-bs-theme="dark">
+
+<div class="toast-container">
+    <div class="toast align-items-center text-bg-success border-0" role="alert" th:if="${successMessage}">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <strong class="me-2">Success</strong>
+                <div style="white-space: pre-wrap;" th:text="${successMessage}"></div>
+            </div>
+            <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" type="button"></button>
+        </div>
+    </div>
+    <div class="toast align-items-center text-bg-danger border-0" role="alert" th:if="${errorMessage}">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong class="me-2">Error</strong>
+                <div style="white-space: pre-wrap;" th:text="${errorMessage}"></div>
+            </div>
+            <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" type="button"></button>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-outline-secondary theme-toggle">
+    <i class="bi bi-sun"></i>
+</button>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-4">
+                <h1 class="display-4"><i class="bi bi-collection-play me-2"></i>Media Library</h1>
+                <p class="text-muted">Upload and manage your media files</p>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Upload File</h5>
+                </div>
+                <div class="card-body">
+                    <form action="#" enctype="multipart/form-data" method="post"
+                          th:action="@{/upload-file}" th:object="${uploadFileRequest}">
+                        <div class="mb-3">
+                            <label for="file-input" class="form-label">Choose a file to upload</label>
+                            <input id="file-input"
+                                   class="form-control"
+                                   required
+                                   th:attr="accept=${allowedExtensions}"
+                                   th:field="*{file}"
+                                   type="file">
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-upload me-2"></i>Upload
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-folder2-open"></i> Uploaded Files</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table">
+                            <tr>
+                                <th colspan="3"><i class="bi bi-file-earmark"></i>Name</th>
+                                <th>Extension</th>
+                                <th>Size</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${fileMetadataResponse.isEmpty()}">
+                                <td class="text-center text-muted py-4" colspan="6">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    No files available
+                                </td>
+                            </tr>
+                            <tr th:each="file : ${fileMetadataResponse}">
+                                <td colspan="3">
+                                    <i class="bi bi-file-earmark-text text-primary ms-2"></i>
+                                    <span class="ms-2" th:text="${file.name}">Name</span>
+                                </td>
+                                <td>
+                                    <span th:text="${file.extension}">Extension</span>
+                                </td>
+                                <td>
+                                    <span th:text="${@fileSize.formatSize(file.size)}">Size</span>
+                                </td>
+                                <td>
+                                    <form class="d-inline" method="get" th:action="@{/get-file}">
+                                        <input name="id" th:value="${file.id}" type="hidden">
+                                        <button class="btn btn-sm btn-outline-primary" type="submit">
+                                            <i class="bi bi-info-circle-fill"></i>
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-sm btn-warning open-rename-modal"
+                                            th:attr="data-file-id=${file.id},data-file-name=${file.name+'.'+file.extension}"
+                                            type="button">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger open-delete-modal"
+                                            th:attr="data-file-id=${file.id}"
+                                            type="button">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="fileInfoModalLabel" class="modal fade" id="fileInfoModal" tabindex="-1"
+     th:if="${fileMetadataDetailedResponse}">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileInfoModalLabel" th:text="${fileMetadataDetailedResponse.name}">File
+                    Information</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="p-3">
+                    <div class="mb-3 text-center">
+                        <video controls id="fileInfoVideo" style="width: 100%; height: auto;">
+                            <source th:attr="src=@{/serve-video/{id}(id=${fileMetadataDetailedResponse.id})}">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <table class="table table-striped table-bordered mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Extension</th>
+                            <td th:text="${fileMetadataDetailedResponse.extension}">Extension</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Size</th>
+                            <td th:text="${fileMetadataDetailedResponse.size}">Size</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                <a class="btn btn-primary"
+                   th:attr="download=${fileMetadataDetailedResponse.name + '.' + fileMetadataDetailedResponse.extension}"
+                   th:href="@{/serve-video/{id}(id=${fileMetadataDetailedResponse.id})}">
+                    Download
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" class="modal fade" id="renameFileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" th:action="@{/rename-file}">
+                <input id="modalRenameId" name="id" type="hidden">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rename File</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="modalRenameName">New Name</label>
+                        <input class="form-control" id="modalRenameName" name="newFilename" required type="text">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                    <button class="btn btn-warning" type="submit">Rename</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" th:action="@{/delete-file}">
+                <input id="modalDeleteId" name="id" type="hidden">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    Do you really want to delete this file?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>
