@@ -29,6 +29,8 @@ import java.util.Objects;
 
 @Service
 public class MediaLibraryService {
+    private final FileInfoService fileInfoService;
+    private final MediaInfoService mediaInfoService;
     private final GetFileValidator getFileValidator;
     private final AddFileValidator addFileValidator;
     private final RenameFileValidator renameFileValidator;
@@ -38,7 +40,9 @@ public class MediaLibraryService {
     @Value("${com.multimedia.media-library.media.path}")
     private String mediaPath;
 
-    public MediaLibraryService(GetFileValidator getFileValidator, AddFileValidator addFileValidator, RenameFileValidator renameFileValidator, DeleteFileValidator deleteFileValidator, FileMetadataMapper fileMetadataMapper, FileMetadataDetailedMapper fileMetadataDetailedMapper) {
+    public MediaLibraryService(FileInfoService fileInfoService, MediaInfoService mediaInfoService, GetFileValidator getFileValidator, AddFileValidator addFileValidator, RenameFileValidator renameFileValidator, DeleteFileValidator deleteFileValidator, FileMetadataMapper fileMetadataMapper, FileMetadataDetailedMapper fileMetadataDetailedMapper) {
+        this.fileInfoService = fileInfoService;
+        this.mediaInfoService = mediaInfoService;
         this.getFileValidator = getFileValidator;
         this.addFileValidator = addFileValidator;
         this.renameFileValidator = renameFileValidator;
@@ -51,7 +55,9 @@ public class MediaLibraryService {
         File folder = new File(mediaPath);
         return Arrays.stream(Objects.requireNonNull(folder.listFiles()))
                 .filter(file -> !file.isDirectory())
-                .map(fileMetadataMapper::fileToFileMetadataResponse)
+                .map(File::getPath)
+                .map(fileInfoService::getFileInfo)
+                .map(fileMetadataMapper::toFileMetadataResponse)
                 .toList();
     }
 
@@ -64,7 +70,10 @@ public class MediaLibraryService {
         String filePath = mediaPath +
                 File.separator +
                 filename;
-        return fileMetadataDetailedMapper.fileToFileMetadataResponse(new File(filePath));
+        return fileMetadataDetailedMapper.toFileMetadataResponse(
+                fileInfoService.getFileInfo(filePath),
+                mediaInfoService.getMediaInfo(filePath)
+        );
     }
 
     public VideoServingResponse serveVideo(String filename) {
