@@ -10,10 +10,7 @@ import com.multimedia.media_library.mapper.FileMetadataDetailedMapper;
 import com.multimedia.media_library.mapper.FileMetadataMapper;
 import com.multimedia.media_library.model.RenameFileRequest;
 import com.multimedia.media_library.model.Violation;
-import com.multimedia.media_library.utils.file_validator.AddFileValidator;
-import com.multimedia.media_library.utils.file_validator.DeleteFileValidator;
-import com.multimedia.media_library.utils.file_validator.GetFileValidator;
-import com.multimedia.media_library.utils.file_validator.RenameFileValidator;
+import com.multimedia.media_library.utils.file_validator.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.Authentication;
@@ -30,25 +27,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static com.multimedia.media_library.utils.file_validator.FileValidatorOperationType.*;
+
 @Service
 public class MediaLibraryService {
     private final FileInfoService fileInfoService;
     private final MediaInfoService mediaInfoService;
-    private final GetFileValidator getFileValidator;
-    private final AddFileValidator addFileValidator;
-    private final RenameFileValidator renameFileValidator;
-    private final DeleteFileValidator deleteFileValidator;
+    private final FileValidatorRegistry fileValidatorRegistry;
     private final FileMetadataMapper fileMetadataMapper;
     private final FileMetadataDetailedMapper fileMetadataDetailedMapper;
     private final String mediaPath;
 
-    public MediaLibraryService(FileInfoService fileInfoService, MediaInfoService mediaInfoService, GetFileValidator getFileValidator, AddFileValidator addFileValidator, RenameFileValidator renameFileValidator, DeleteFileValidator deleteFileValidator, FileMetadataMapper fileMetadataMapper, FileMetadataDetailedMapper fileMetadataDetailedMapper, @Value("${com.multimedia.media-library.media.path}") String mediaPath) {
+    public MediaLibraryService(FileInfoService fileInfoService, MediaInfoService mediaInfoService, FileValidatorRegistry fileValidatorRegistry, FileMetadataMapper fileMetadataMapper, FileMetadataDetailedMapper fileMetadataDetailedMapper, @Value("${com.multimedia.media-library.media.path}") String mediaPath) {
         this.fileInfoService = fileInfoService;
         this.mediaInfoService = mediaInfoService;
-        this.getFileValidator = getFileValidator;
-        this.addFileValidator = addFileValidator;
-        this.renameFileValidator = renameFileValidator;
-        this.deleteFileValidator = deleteFileValidator;
+        this.fileValidatorRegistry = fileValidatorRegistry;
         this.fileMetadataMapper = fileMetadataMapper;
         this.fileMetadataDetailedMapper = fileMetadataDetailedMapper;
         this.mediaPath = mediaPath;
@@ -67,7 +60,7 @@ public class MediaLibraryService {
 
     public FileMetadataDetailedResponse getFile(String filename) {
         String userMediaPath = getUserMediaPath();
-        List<Violation> violations = getFileValidator.validate(userMediaPath, filename);
+        List<Violation> violations = fileValidatorRegistry.get(GET).validate(userMediaPath, filename);
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
         }
@@ -102,7 +95,7 @@ public class MediaLibraryService {
     public void addFile(UploadFileRequest uploadFileRequest) {
         String userMediaPath = getUserMediaPath();
         try {
-            List<Violation> violations = addFileValidator.validate(userMediaPath, uploadFileRequest.getFile());
+            List<Violation> violations = fileValidatorRegistry.get(ADD).validate(userMediaPath, uploadFileRequest.getFile());
             if (!violations.isEmpty()) {
                 throw new ValidationException(violations);
             }
@@ -119,7 +112,7 @@ public class MediaLibraryService {
     public void renameFile(String id, String newFilename) {
         String userMediaPath = getUserMediaPath();
         try {
-            List<Violation> violations = renameFileValidator.validate(userMediaPath, new RenameFileRequest(id, newFilename));
+            List<Violation> violations = fileValidatorRegistry.get(RENAME).validate(userMediaPath, new RenameFileRequest(id, newFilename));
             if (!violations.isEmpty()) {
                 throw new ValidationException(violations);
             }
@@ -136,7 +129,7 @@ public class MediaLibraryService {
     public void deleteFile(String filename) {
         String userMediaPath = getUserMediaPath();
         try {
-            List<Violation> violations = deleteFileValidator.validate(userMediaPath, filename);
+            List<Violation> violations = fileValidatorRegistry.get(DELETE).validate(userMediaPath, filename);
             if (!violations.isEmpty()) {
                 throw new ValidationException(violations);
             }
