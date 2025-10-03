@@ -24,8 +24,7 @@ public class AddFileValidator implements FileValidator<MultipartFile> {
     public List<Violation> validate(String directory, MultipartFile file) {
         List<Violation> violations = new ArrayList<>();
 
-        boolean isRequestIncomplete = file.isEmpty();
-        if (isRequestIncomplete) {
+        if (file.isEmpty()) {
             violations.add(new Violation(String.format("Invalid file named \"%s\".", file.getOriginalFilename())));
             return violations;
         }
