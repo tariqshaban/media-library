@@ -82,16 +82,12 @@ public class MediaLibraryService {
         }
 
         try {
-            VideoServingResponse videoServingResponse = new VideoServingResponse();
-
             Path videoPath = Paths.get(userMediaPath).resolve(filename);
             UrlResource resource = new UrlResource(videoPath.toUri());
-            videoServingResponse.setResource(resource);
 
             String mimeType = Files.probeContentType(videoPath);
-            videoServingResponse.setMimeType(mimeType);
 
-            return videoServingResponse;
+            return new VideoServingResponse(resource, mimeType);
         } catch (IOException e) {
             throw new UnhandledException(String.format("Failed to serve file named \"%s\"", filename));
         }
