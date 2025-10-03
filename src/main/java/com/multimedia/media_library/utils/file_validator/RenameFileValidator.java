@@ -20,7 +20,7 @@ public class RenameFileValidator implements FileValidator<RenameFileRequest> {
         Path newPath = Paths.get(directory).resolve(renameFileRequest.getNewFilename());
 
         if (!Files.exists(oldPath)) {
-            violations.add(new Violation(String.format("File named \"%s\" cannot be deleted since it does not exist.", renameFileRequest.getOldFilename())));
+            violations.add(new Violation(String.format("File named \"%s\" cannot be renamed since it does not exist.", renameFileRequest.getOldFilename())));
         }
         if (Files.exists(newPath)) {
             violations.add(new Violation(String.format("File named \"%s\" already exist.", renameFileRequest.getNewFilename())));
