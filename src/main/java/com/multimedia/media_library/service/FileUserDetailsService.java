@@ -49,6 +49,6 @@ public class FileUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found: " + username);
         }
-        return user;
+        return User.withUserDetails(user).build();
     }
 }
