@@ -1,7 +1,8 @@
 package com.multimedia.media_library.service;
 
 import jakarta.annotation.PostConstruct;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,11 +20,15 @@ import java.util.Map;
 @Service
 public class FileUserDetailsService implements UserDetailsService {
     private final Map<String, UserDetails> users = new HashMap<>();
+    private final Resource userCredentialsPath;
+
+    public FileUserDetailsService(@Value("${com.multimedia.media-library.users.credentials.path}") Resource userCredentialsPath) {
+        this.userCredentialsPath = userCredentialsPath;
+    }
 
     @PostConstruct
     public void loadUsers() throws IOException {
-        ClassPathResource resource = new ClassPathResource("users.txt");
-        try (var reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+        try (var reader = new BufferedReader(new InputStreamReader(userCredentialsPath.getInputStream()))) {
             reader.lines()
                     .filter(line -> !line.trim().isEmpty() && !line.startsWith("#"))
                     .map(line -> line.split(":", 2))
