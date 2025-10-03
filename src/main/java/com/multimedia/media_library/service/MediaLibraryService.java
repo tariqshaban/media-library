@@ -60,7 +60,7 @@ public class MediaLibraryService {
         return Arrays.stream(Objects.requireNonNull(folder.listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getPath)
-                .map(fileInfoService::getFileInfo)
+                .map(fileInfoService::getFileInformation)
                 .map(fileMetadataMapper::toFileMetadataResponse)
                 .toList();
     }
@@ -76,7 +76,7 @@ public class MediaLibraryService {
                 File.separator +
                 filename;
         return fileMetadataDetailedMapper.toFileMetadataResponse(
-                fileInfoService.getFileInfo(filePath),
+                fileInfoService.getFileInformation(filePath),
                 mediaInfoService.getMediaInfo(filePath)
         );
     }

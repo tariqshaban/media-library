@@ -1,15 +1,15 @@
 package com.multimedia.media_library.service;
 
-import com.multimedia.media_library.model.FileInfo;
+import com.multimedia.media_library.model.FileInformation;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 
 @Service
 public class FileInfoService {
-    public FileInfo getFileInfo(String filePath) {
+    public FileInformation getFileInformation(String filePath) {
         File file = new File(filePath);
-        return FileInfo.builder()
+        return FileInformation.builder()
                 .id(getId(file))
                 .name(getName(file))
                 .extension(getExtension(file))
