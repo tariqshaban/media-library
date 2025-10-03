@@ -76,6 +76,11 @@ public class MediaLibraryService {
 
     public VideoServingResponse serveVideo(String filename) {
         String userMediaPath = getUserMediaPath();
+        List<Violation> violations = fileValidatorRegistry.get(GET).validate(userMediaPath, filename);
+        if (!violations.isEmpty()) {
+            throw new ValidationException(violations);
+        }
+
         try {
             VideoServingResponse videoServingResponse = new VideoServingResponse();
 
