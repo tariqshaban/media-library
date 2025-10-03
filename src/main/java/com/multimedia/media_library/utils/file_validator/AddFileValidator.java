@@ -1,6 +1,5 @@
 package com.multimedia.media_library.utils.file_validator;
 
-import com.multimedia.media_library.dto.UploadFileRequest;
 import com.multimedia.media_library.model.Violation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,10 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static java.util.Optional.of;
-
 @Component
-public class AddFileValidator implements FileValidator<UploadFileRequest> {
+public class AddFileValidator implements FileValidator<MultipartFile> {
     private final List<String> allowedExtensions;
 
     public AddFileValidator(@Value("${com.multimedia.media-library.media.allowed.extensions}") List<String> allowedExtensions) {
@@ -24,27 +21,23 @@ public class AddFileValidator implements FileValidator<UploadFileRequest> {
     }
 
     @Override
-    public List<Violation> validate(String directory, UploadFileRequest uploadFileRequest) {
+    public List<Violation> validate(String directory, MultipartFile file) {
         List<Violation> violations = new ArrayList<>();
-        MultipartFile file = uploadFileRequest.getFile();
 
-        boolean isRequestIncomplete = of(uploadFileRequest)
-                .map(UploadFileRequest::getFile)
-                .filter(MultipartFile::isEmpty)
-                .isPresent();
+        boolean isRequestIncomplete = file.isEmpty();
         if (isRequestIncomplete) {
-            violations.add(new Violation(String.format("Invalid file named \"%s\".", uploadFileRequest.getFile().getOriginalFilename())));
+            violations.add(new Violation(String.format("Invalid file named \"%s\".", file.getOriginalFilename())));
             return violations;
         }
 
         String contentType = Objects.requireNonNull(file).getContentType();
         if (contentType == null || !contentType.startsWith("video/")) {
-            violations.add(new Violation(String.format("File named \"%s\" can only be a video mime type.", uploadFileRequest.getFile().getOriginalFilename())));
+            violations.add(new Violation(String.format("File named \"%s\" can only be a video mime type.", file.getOriginalFilename())));
         }
 
         String filename = file.getOriginalFilename();
         if (filename == null || !hasAllowedExtension(filename)) {
-            violations.add(new Violation(String.format("File named \"%s\" does not have an allowed file extension.", uploadFileRequest.getFile().getOriginalFilename())));
+            violations.add(new Violation(String.format("File named \"%s\" does not have an allowed file extension.", file.getOriginalFilename())));
             return violations;
         }
 

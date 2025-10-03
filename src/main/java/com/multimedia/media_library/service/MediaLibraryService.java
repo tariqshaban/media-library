@@ -102,7 +102,7 @@ public class MediaLibraryService {
     public void addFile(UploadFileRequest uploadFileRequest) {
         String userMediaPath = getUserMediaPath();
         try {
-            List<Violation> violations = addFileValidator.validate(userMediaPath, uploadFileRequest);
+            List<Violation> violations = addFileValidator.validate(userMediaPath, uploadFileRequest.getFile());
             if (!violations.isEmpty()) {
                 throw new ValidationException(violations);
             }
