@@ -30,14 +30,13 @@ import static com.multimedia.media_library.common.Constants.SUCCESS_MESSAGE_KEY;
 @Validated
 class MediaLibraryController implements RedirectAttributeProvider {
     private final MediaLibraryService mediaLibraryService;
-
-    @Value("${com.multimedia.media-library.media.allowed.extensions}")
-    private String allowedExtensions;
+    private final String allowedExtensions;
 
     private String allowedExtensionsTransformed;
 
-    MediaLibraryController(MediaLibraryService mediaLibraryService) {
+    MediaLibraryController(MediaLibraryService mediaLibraryService, @Value("${com.multimedia.media-library.media.allowed.extensions}") String allowedExtensions) {
         this.mediaLibraryService = mediaLibraryService;
+        this.allowedExtensions = allowedExtensions;
     }
 
     @PostConstruct

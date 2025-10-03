@@ -40,11 +40,9 @@ public class MediaLibraryService {
     private final DeleteFileValidator deleteFileValidator;
     private final FileMetadataMapper fileMetadataMapper;
     private final FileMetadataDetailedMapper fileMetadataDetailedMapper;
+    private final String mediaPath;
 
-    @Value("${com.multimedia.media-library.media.path}")
-    private String mediaPath;
-
-    public MediaLibraryService(FileInfoService fileInfoService, MediaInfoService mediaInfoService, GetFileValidator getFileValidator, AddFileValidator addFileValidator, RenameFileValidator renameFileValidator, DeleteFileValidator deleteFileValidator, FileMetadataMapper fileMetadataMapper, FileMetadataDetailedMapper fileMetadataDetailedMapper) {
+    public MediaLibraryService(FileInfoService fileInfoService, MediaInfoService mediaInfoService, GetFileValidator getFileValidator, AddFileValidator addFileValidator, RenameFileValidator renameFileValidator, DeleteFileValidator deleteFileValidator, FileMetadataMapper fileMetadataMapper, FileMetadataDetailedMapper fileMetadataDetailedMapper, @Value("${com.multimedia.media-library.media.path}") String mediaPath) {
         this.fileInfoService = fileInfoService;
         this.mediaInfoService = mediaInfoService;
         this.getFileValidator = getFileValidator;
@@ -53,6 +51,7 @@ public class MediaLibraryService {
         this.deleteFileValidator = deleteFileValidator;
         this.fileMetadataMapper = fileMetadataMapper;
         this.fileMetadataDetailedMapper = fileMetadataDetailedMapper;
+        this.mediaPath = mediaPath;
     }
 
     public List<FileMetadataResponse> getFiles() {

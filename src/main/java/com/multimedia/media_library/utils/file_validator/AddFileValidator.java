@@ -17,8 +17,11 @@ import static java.util.Optional.of;
 
 @Component
 public class AddFileValidator implements FileValidator<UploadFileRequest> {
-    @Value("${com.multimedia.media-library.media.allowed.extensions}")
-    private List<String> allowedExtensions;
+    private final List<String> allowedExtensions;
+
+    public AddFileValidator(@Value("${com.multimedia.media-library.media.allowed.extensions}") List<String> allowedExtensions) {
+        this.allowedExtensions = allowedExtensions;
+    }
 
     @Override
     public List<Violation> validate(String directory, UploadFileRequest uploadFileRequest) {

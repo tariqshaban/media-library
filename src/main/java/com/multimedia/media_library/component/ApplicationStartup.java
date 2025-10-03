@@ -13,12 +13,11 @@ import java.nio.file.Paths;
 @Component
 public class ApplicationStartup {
     private final FileUserDetailsService fileUserDetailsService;
+    private final String mediaPath;
 
-    @Value("${com.multimedia.media-library.media.path}")
-    private String mediaPath;
-
-    public ApplicationStartup(FileUserDetailsService fileUserDetailsService) {
+    public ApplicationStartup(FileUserDetailsService fileUserDetailsService, @Value("${com.multimedia.media-library.media.path}") String mediaPath) {
         this.fileUserDetailsService = fileUserDetailsService;
+        this.mediaPath = mediaPath;
     }
 
     @EventListener(ApplicationReadyEvent.class)
