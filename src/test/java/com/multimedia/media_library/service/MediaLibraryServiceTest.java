@@ -49,12 +49,12 @@ class MediaLibraryServiceTest {
     private static final int SAMPLE_VIDEO_SIZE = 1024;
     private static final String VIOLATION_MESSAGE = "VIOLATION_MESSAGE";
 
-    @TempDir
-    private Path tempDir;
     private final GetFileValidator getFileValidator = mock(GetFileValidator.class);
     private final AddFileValidator addFileValidator = mock(AddFileValidator.class);
     private final RenameFileValidator renameFileValidator = mock(RenameFileValidator.class);
     private final DeleteFileValidator deleteFileValidator = mock(DeleteFileValidator.class);
+    @TempDir
+    private Path tempDir;
 
     private MediaLibraryService mediaLibraryService;
 

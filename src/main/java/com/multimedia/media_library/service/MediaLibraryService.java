@@ -10,7 +10,7 @@ import com.multimedia.media_library.mapper.FileMetadataDetailedMapper;
 import com.multimedia.media_library.mapper.FileMetadataMapper;
 import com.multimedia.media_library.model.RenameFileRequest;
 import com.multimedia.media_library.model.Violation;
-import com.multimedia.media_library.utils.file_validator.*;
+import com.multimedia.media_library.utils.file_validator.FileValidatorRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.Authentication;

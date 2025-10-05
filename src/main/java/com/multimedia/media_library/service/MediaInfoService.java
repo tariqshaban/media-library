@@ -12,6 +12,36 @@ import java.util.Map;
 
 @Service
 public class MediaInfoService {
+    private static Duration parseDuration(String value) {
+        String str = value.split(" ")[0];
+        String[] hms = str.split(":");
+
+        int hours = hms.length == 3 ? Integer.parseInt(hms[0]) : 0;
+        int minutes = hms.length >= 2 ? Integer.parseInt(hms[hms.length - 2]) : 0;
+        double seconds = Double.parseDouble(hms[hms.length - 1]);
+
+        long totalMillis = (hours * 3600L + minutes * 60L) * 1000 + (long) (seconds * 1000);
+        return Duration.ofMillis(totalMillis);
+    }
+
+    private static Date parseDate(String value) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS z");
+        return Date.from(ZonedDateTime.parse(value, formatter).toInstant()
+        );
+    }
+
+    private static int parseInt(String value) {
+        return Integer.parseInt(value.replaceAll("\\D", ""));
+    }
+
+    private static float parseFloat(String value) {
+        return Float.parseFloat(value.replaceAll("[^\\d.]", ""));
+    }
+
+    private static boolean parseBoolean(String value) {
+        return value.equalsIgnoreCase("yes");
+    }
+
     MediaInformation getMediaInfo(String mediaPath) {
         MediaInfo mediaInfo = MediaInfo.mediaInfo(mediaPath);
         return MediaInformation.builder()
@@ -60,35 +90,5 @@ public class MediaInfoService {
                 .compressionMode(values.get("Compression mode"))
                 .samplingRate(values.get("Sampling rate"))
                 .build();
-    }
-
-    private static Duration parseDuration(String value) {
-        String str = value.split(" ")[0];
-        String[] hms = str.split(":");
-
-        int hours = hms.length == 3 ? Integer.parseInt(hms[0]) : 0;
-        int minutes = hms.length >= 2 ? Integer.parseInt(hms[hms.length - 2]) : 0;
-        double seconds = Double.parseDouble(hms[hms.length - 1]);
-
-        long totalMillis = (hours * 3600L + minutes * 60L) * 1000 + (long) (seconds * 1000);
-        return Duration.ofMillis(totalMillis);
-    }
-
-    private static Date parseDate(String value) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS z");
-        return Date.from(ZonedDateTime.parse(value, formatter).toInstant()
-        );
-    }
-
-    private static int parseInt(String value) {
-        return Integer.parseInt(value.replaceAll("\\D", ""));
-    }
-
-    private static float parseFloat(String value) {
-        return Float.parseFloat(value.replaceAll("[^\\d.]", ""));
-    }
-
-    private static boolean parseBoolean(String value) {
-        return value.equalsIgnoreCase("yes");
     }
 }
